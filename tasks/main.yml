@@ -1,1 +1,42 @@
 ---
+# nginx
+- name: Create ubuntu ISO directory.
+  file: path={{ pxe_server_ubuntu_iso_mount_path }} state=directory
+
+- name: Create preseed files directory.
+  file: path={{ pxe_server_ubuntu_preseed_path }} state=directory
+
+- name: Copy pxe-server nginx config in place.
+  template: src=nginx.conf.j2 dest=/etc/nginx/conf.d/pxe-server-ubuntu.conf
+  notify: reload nginx
+
+# tftp
+# - name: Create pxelinux directories.
+#   file: path=/var/lib/tftpboot/{{ item }} state=directory
+#   with_items:
+#     - pxelinux.cfg
+#     - pxelinux
+#
+# - name: Copy syslinux files.
+#   copy: src="/usr/share/syslinux/{{ item }}" dest=/var/lib/tftpboot/ remote_src=True
+#   with_items:
+#     - pxelinux.0
+#     - menu.c32
+
+# download ISO
+# - name: Download isolinux files from http://ftp.iij.ad.jp/pub/linux/centos/7/os/x86_64/isolinux
+#   get_url: url=http://ftp.iij.ad.jp/pub/linux/centos/7/os/x86_64/isolinux/{{ item }} dest=/var/lib/tftpboot/{{ item }}
+#   with_items:
+#     - initrd.img
+#     - vmlinuz
+
+- name: Download ubuntu server image.
+  get_url: url={{ pxe_server_ubuntu_iso_download_path }} dest={{ pxe_server_ubuntu_iso_file_path }}
+
+# ISO mount
+- name: Mount the ubuntu server image.
+  mount: name={{ pxe_server_ubuntu_iso_mount_path }} src={{ pxe_server_ubuntu_iso_file_path }} opts=ro,loop fstype=iso9660 state=mounted
+
+# PXE menu.
+# - name: Copy default menu.
+#   template: src=default.menu.j2 dest=/var/lib/tftpboot/pxelinux.cfg/default

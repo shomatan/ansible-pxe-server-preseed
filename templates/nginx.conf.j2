@@ -1,0 +1,15 @@
+# Managed by ansible
+
+server {
+  listen {{ pxe_server_ubuntu_listen }};
+
+  autoindex on;
+
+  location /ubuntu-16.04 {
+    alias {{ pxe_server_ubuntu_iso_mount_path }};
+  }
+
+  location /preseed {
+    alias {{ pxe_server_ubuntu_preseed_path }};
+  }
+}

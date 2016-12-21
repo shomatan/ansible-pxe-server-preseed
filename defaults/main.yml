@@ -1,0 +1,6 @@
+---
+pxe_server_ubuntu_preseed_path: /var/www/html/preseed
+pxe_server_ubuntu_listen: 127.0.0.1:8189
+pxe_server_ubuntu_iso_mount_path: /var/www/html/ubuntu-16.04
+pxe_server_ubuntu_iso_download_path: "http://ftp.riken.jp/Linux/ubuntu-releases/16.04.1/ubuntu-16.04.1-server-amd64.iso"
+pxe_server_ubuntu_iso_file_path: /var/lib/tftpboot/ubuntu-16.04.iso
