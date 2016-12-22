@@ -1,10 +1,10 @@
 ---
 # nginx
 - name: Create ubuntu ISO directory.
-  file: path={{ pxe_server_ubuntu_iso_mount_path }} state=directory
+  file: path={{ pxe_server_preseed_iso_mount_path }} state=directory
 
 - name: Create preseed files directory.
-  file: path={{ pxe_server_ubuntu_preseed_path }} state=directory
+  file: path={{ pxe_server_preseed_file_path }} state=directory
 
 - name: Copy pxe-server nginx config in place.
   template: src=nginx.conf.j2 dest=/etc/nginx/conf.d/pxe-server-ubuntu.conf
@@ -31,11 +31,11 @@
 #     - vmlinuz
 
 - name: Download ubuntu server image.
-  get_url: url={{ pxe_server_ubuntu_iso_download_path }} dest={{ pxe_server_ubuntu_iso_file_path }}
+  get_url: url={{ pxe_server_preseed_iso_download_path }} dest={{ pxe_server_preseed_iso_file_path }}
 
 # ISO mount
 - name: Mount the ubuntu server image.
-  mount: name={{ pxe_server_ubuntu_iso_mount_path }} src={{ pxe_server_ubuntu_iso_file_path }} opts=ro,loop fstype=iso9660 state=mounted
+  mount: name={{ pxe_server_preseed_iso_mount_path }} src={{ pxe_server_preseed_iso_file_path }} opts=ro,loop fstype=iso9660 state=mounted
 
 # PXE menu.
 # - name: Copy default menu.
