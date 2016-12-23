@@ -10,26 +10,15 @@
   template: src=nginx.conf.j2 dest=/etc/nginx/conf.d/pxe-server-ubuntu.conf
   notify: reload nginx
 
-# tftp
-# - name: Create pxelinux directories.
-#   file: path=/var/lib/tftpboot/{{ item }} state=directory
-#   with_items:
-#     - pxelinux.cfg
-#     - pxelinux
-#
-# - name: Copy syslinux files.
-#   copy: src="/usr/share/syslinux/{{ item }}" dest=/var/lib/tftpboot/ remote_src=True
-#   with_items:
-#     - pxelinux.0
-#     - menu.c32
+# tfpt root directories
+- name: Create pxelinux directories.
+  file: path={{ pxe_server_preseed_tftpboot_path }}/{{ item }} state=directory
+  with_items:
+    - ""
+    - pxelinux.cfg
+    - boot-screens
 
 # download ISO
-# - name: Download isolinux files from http://ftp.iij.ad.jp/pub/linux/centos/7/os/x86_64/isolinux
-#   get_url: url=http://ftp.iij.ad.jp/pub/linux/centos/7/os/x86_64/isolinux/{{ item }} dest=/var/lib/tftpboot/{{ item }}
-#   with_items:
-#     - initrd.img
-#     - vmlinuz
-
 - name: Download ubuntu server image.
   get_url: url={{ pxe_server_preseed_iso_download_path }} dest={{ pxe_server_preseed_iso_file_path }}
 
@@ -37,6 +26,37 @@
 - name: Mount the ubuntu server image.
   mount: name={{ pxe_server_preseed_iso_mount_path }} src={{ pxe_server_preseed_iso_file_path }} opts=ro,loop fstype=iso9660 state=mounted
 
+# tftp
+- name: Copy syslinux files.
+  copy:
+    src: "{{ pxe_server_preseed_iso_mount_path }}/install/netboot/{{ item }}"
+    dest: "{{ pxe_server_preseed_tftpboot_path }}/{{ item }}"
+    remote_src: True
+  with_items:
+    - pxelinux.0
+    - ldlinux.c32
+
+- name: Check ubuntu installer directory exists.
+  stat: path={{ pxe_server_preseed_tftpboot_path }}/ubuntu-installer
+  register: installer_exists
+  
+- name: Copy ubuntu installer directory.
+  shell: cp -r {{ pxe_server_preseed_iso_mount_path }}/install/netboot/ubuntu-installer {{ pxe_server_preseed_tftpboot_path }}/
+  when: not installer_exists.stat.exists
+
+- name: Copy boot-screens files.
+  copy:
+    src: "{{ pxe_server_preseed_iso_mount_path }}/install/netboot/ubuntu-installer/amd64/boot-screens/{{ item }}"
+    dest: "{{ pxe_server_preseed_tftpboot_path }}/boot-screens/{{ item }}"
+    remote_src: True
+  with_items:
+    - libcom32.c32
+    - libutil.c32
+    - vesamenu.c32
+
 # PXE menu.
-# - name: Copy default menu.
-#   template: src=default.menu.j2 dest=/var/lib/tftpboot/pxelinux.cfg/default
+- name: Copy preseed config file.
+  template: src=syslinux.cfg.j2 dest={{ pxe_server_preseed_tftpboot_path }}/pxelinux.cfg/default
+
+- name: Copy default menu.
+  template: src=menu.j2 dest={{ pxe_server_preseed_tftpboot_path }}/boot-screens/menu.cfg

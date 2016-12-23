@@ -1,6 +1,11 @@
 ---
+pxe_server_preseed_tftpboot_path: /var/lib/tftpboot/debian
 pxe_server_preseed_file_path: /var/www/html/preseed
 pxe_server_preseed_listen: 127.0.0.1:8188
+pxe_server_preseed_iso_file_path: "{{ pxe_server_preseed_tftpboot_path }}/ubuntu-16.04.iso"
 pxe_server_preseed_iso_mount_path: /var/www/html/ubuntu-16.04
 pxe_server_preseed_iso_download_path: "http://ftp.riken.jp/Linux/ubuntu-releases/16.04.1/ubuntu-16.04.1-server-amd64.iso"
-pxe_server_preseed_iso_file_path: /var/lib/tftpboot/ubuntu-16.04.iso
+
+pxe_server_preseed_default_timeout: 300
+pxe_server_preseed_default_title: "Debian PXE Boot Menu"
+pxe_server_preseed_default_menu: {}

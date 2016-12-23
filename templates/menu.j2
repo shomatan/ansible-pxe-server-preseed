@@ -1,0 +1,14 @@
+# Managed by ansible
+
+menu hshift 13
+menu width 49
+menu margin 8
+menu tabmsg
+
+menu title {{ pxe_server_preseed_default_title }}
+
+{% for key, value in pxe_server_preseed_default_menu.iteritems() %}
+label {{ key }}
+    kernel ubuntu-installer/amd64/linux
+    append auto=true priority=critical vga=788 initrd=ubuntu-installer/amd64/initrd.gz preseed/url=http://{{ pxe_server_preseed_listen }}/preseed/{{ value }} preseed/interactive=false
+{% endfor %}
